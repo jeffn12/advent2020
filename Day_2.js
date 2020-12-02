@@ -1031,4 +1031,30 @@ function countValidPasswords(list) {
   return count;
 }
 
+/**
+ * Day 2 - Puzzle 2
+ *
+ * Count the number of valid password in the input
+ * A password is valid if a specified character occurs exactly 1 time in the * specified positions
+ *
+ * @param list Array of strings in format: "pos1-pos2 char: password"
+ * @returns Number of valid passwords in the list
+ */
+function countValidPasswordsByPosition(list) {
+  let count = 0;
+  list.forEach((pass) => {
+    const { char, min: position1, max: position2, password } = pass;
+    if (
+      (password[position1 - 1] === char && password[position2 - 1] !== char) ||
+      (password[position1 - 1] !== char && password[position2 - 1] === char)
+    ) {
+      count++;
+    }
+  });
+  return count;
+}
 console.log("Valid Passwords (Range): ", countValidPasswords(input));
+console.log(
+  "Valid Passwords (Positions): ",
+  countValidPasswordsByPosition(input)
+);
