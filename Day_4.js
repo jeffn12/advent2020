@@ -1183,9 +1183,10 @@ function countValidPassports(passportList) {
   passportList.forEach((passport) => {
     const passportData = passport.split(" ");
     let fields = [];
-    passportData.forEach((line) => {
-      fields.push(line.substr(0, 3));
-    });
+    passportData.length >= 7 &&
+      passportData.forEach((line) => {
+        fields.push(line.substr(0, 3));
+      });
     if (
       fields.length === 8 ||
       (fields.length === 7 && !fields.includes("cid"))
@@ -1196,4 +1197,75 @@ function countValidPassports(passportList) {
   return validPassportCount;
 }
 
+/**
+ * Puzzle 2 - Too many invalid passports were getting through, check to make sure each credential has a valid value
+ *
+ * @param {Array} passportList
+ * @returns {Number} count of valid passports in given list
+ */
+function countActuallyValidPassports(passportList) {
+  let validPassportCount = 0;
+  passportList.forEach((passport) => {
+    const passportData = passport.split(" ");
+    let fields = [];
+    passportData.length >= 7 &&
+      passportData.forEach((line) => {
+        const credential = line.split(":");
+        isValidCredential(credential[0], credential[1]) &&
+          fields.push(credential[0]);
+      });
+    if (fields.length === 8 || (fields.length === 7 && !fields.includes("cid")))
+      validPassportCount++;
+  });
+  return validPassportCount;
+}
+
+/**
+ * Validate Credentials - check to see if value provided for credential falls within given specifications
+ *
+ * @param {String} cred the 3-letter credential key
+ * @param {String} value the value provided with the credential to validate
+ * @returns {Boolean} true if credential is valid, false if it is not
+ */
+function isValidCredential(cred, value) {
+  switch (cred) {
+    case "byr":
+      if (parseInt(value) >= 1920 && parseInt(value) <= 2002) {
+        return true;
+      } else return false;
+    case "iyr":
+      if (parseInt(value) >= 2010 && parseInt(value) <= 2020) {
+        return true;
+      } else return false;
+    case "eyr":
+      if (parseInt(value) >= 2020 && parseInt(value) <= 2030) {
+        return true;
+      } else return false;
+    case "hgt":
+      const val = value.substr(0, value.length - 2);
+      const unit = value.substr(value.length - 2);
+      if (
+        (unit === "in" && val >= 59 && val <= 76) ||
+        (unit === "cm" && val >= 150 && val <= 193)
+      ) {
+        return true;
+      } else return false;
+    case "hcl":
+      return /^#[\da-f]{6}$/.test(value);
+    case "ecl":
+      return ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"].includes(value);
+    case "pid":
+      return /^\d{9}$/.test(value);
+    case "cid":
+      return true;
+    default:
+      return false;
+  }
+}
+
+// Puzzle Output
 console.log("Puzzle 1 - Valid Passports in List:", countValidPassports(input));
+console.log(
+  "Puzzle 2 - Actually Valid Passports in List:",
+  countActuallyValidPassports(input)
+);
