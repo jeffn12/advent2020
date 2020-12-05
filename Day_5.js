@@ -1,7 +1,3 @@
-const sampleInput = `BFFFBBFRRR
-FFFBBBFRRR
-BBFFBBFRLL`.split("\n");
-
 const input = `BFBBBBBLLR
 BBFFBBFRRL
 FBFBFFFRRL
@@ -969,35 +965,11 @@ FBBFFFBRLL`.split("\n");
  *
  * @param {Array} boardingPassList list of boarding pass codes for parsing
  * @returns {Number} the greatest seatID decoded
- *
- * TODO: make this function accept 1 boarding pass and return its seat ID
  */
 function getHighestId(boardingPassList) {
   let highestSeatID = 0;
   boardingPassList.forEach((boardingPass) => {
-    const rowSequence = boardingPass.substring(0, 7);
-    const colSequence = boardingPass.substring(7);
-    let rowMin = 0;
-    let rowMax = 127;
-    let colMin = 0;
-    let colMax = 7;
-    for (let i = 0; i < rowSequence.length; i++) {
-      if (/^[fF]$/.test(rowSequence[i])) {
-        rowMax = (rowMin + rowMax) / 2;
-      } else if (/^[bB]$/.test(rowSequence[i])) {
-        rowMin = (rowMin + rowMax) / 2;
-      }
-    }
-    const seatRow = Math.floor(rowMax);
-    for (let i = 0; i < colSequence.length; i++) {
-      if (/^[lL]$/.test(colSequence[i])) {
-        colMax = (colMin + colMax) / 2;
-      } else if (/^[rR]$/.test(colSequence[i])) {
-        colMin = (colMin + colMax) / 2;
-      }
-    }
-    const seatColumn = Math.floor(colMax);
-    const seatId = seatRow * 8 + seatColumn;
+    const seatId = getSeatId(boardingPass);
     highestSeatID = (seatId > highestSeatID && seatId) || highestSeatID;
   });
   return highestSeatID;
@@ -1011,38 +983,51 @@ function getHighestId(boardingPassList) {
  */
 function findMySeatId(boardingPassList) {
   let seatIds = new Array();
+  let mySeat;
   boardingPassList.forEach((boardingPass) => {
-    const rowSequence = boardingPass.substring(0, 7);
-    const colSequence = boardingPass.substring(7);
-    let rowMin = 0;
-    let rowMax = 127;
-    let colMin = 0;
-    let colMax = 7;
-    for (let i = 0; i < rowSequence.length; i++) {
-      if (/^[fF]$/.test(rowSequence[i])) {
-        rowMax = (rowMin + rowMax) / 2;
-      } else if (/^[bB]$/.test(rowSequence[i])) {
-        rowMin = (rowMin + rowMax) / 2;
-      }
-    }
-    const seatRow = Math.floor(rowMax);
-    for (let i = 0; i < colSequence.length; i++) {
-      if (/^[lL]$/.test(colSequence[i])) {
-        colMax = (colMin + colMax) / 2;
-      } else if (/^[rR]$/.test(colSequence[i])) {
-        colMin = (colMin + colMax) / 2;
-      }
-    }
-    const seatColumn = Math.floor(colMax);
-    seatIds.push(parseInt(seatRow * 8 + seatColumn));
+    seatIds.push(getSeatId(boardingPass));
   });
   seatIds = seatIds.sort((a, b) => a - b);
-  let mySeat;
   for (let i = 1; i < seatIds.length - 1; i++) {
     if (seatIds[i] + 1 !== seatIds[i + 1]) mySeat = seatIds[i] + 1;
   }
   return mySeat;
 }
 
+/**
+ * ID Finder Helper Function -
+ * Given a boardingPass string, return its seatID number
+ *
+ * @param {String} boardingPass string that represents the boarding pass code
+ * @returns {Number} the seatID associated with the boardingPass string
+ */
+function getSeatId(boardingPass) {
+  const rowSequence = boardingPass.substring(0, 7);
+  const colSequence = boardingPass.substring(7);
+  // Find Row Number
+  let rowMin = 0;
+  let rowMax = 127;
+  for (let i = 0; i < rowSequence.length; i++) {
+    if (/^[fF]$/.test(rowSequence[i])) {
+      rowMax = (rowMin + rowMax) / 2;
+    } else if (/^[bB]$/.test(rowSequence[i])) {
+      rowMin = (rowMin + rowMax) / 2;
+    }
+  }
+  // Find Column Number
+  let colMin = 0;
+  let colMax = 7;
+  for (let i = 0; i < colSequence.length; i++) {
+    if (/^[lL]$/.test(colSequence[i])) {
+      colMax = (colMin + colMax) / 2;
+    } else if (/^[rR]$/.test(colSequence[i])) {
+      colMin = (colMin + colMax) / 2;
+    }
+  }
+  // Return seatID = row * 8 + col
+  return Math.floor(rowMax) * 8 + Math.floor(colMax);
+}
+
+// Solution Outputs
 console.log("Puzzle 1 - greatest seat id: ", getHighestId(input));
 console.log("Puzzle 2 - my seat id: ", findMySeatId(input));
