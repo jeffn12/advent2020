@@ -969,6 +969,8 @@ FBBFFFBRLL`.split("\n");
  *
  * @param {Array} boardingPassList list of boarding pass codes for parsing
  * @returns {Number} the greatest seatID decoded
+ *
+ * TODO: make this function accept 1 boarding pass and return its seat ID
  */
 function getHighestId(boardingPassList) {
   let highestSeatID = 0;
@@ -1001,4 +1003,46 @@ function getHighestId(boardingPassList) {
   return highestSeatID;
 }
 
-console.log(getHighestId(input));
+/**
+ * Puzzle 2 - Using the seatIds, find the missing number - it's your seat!
+ *
+ * @param {Array} boardingPassList list of boarding pass codes for parsing
+ * @returns {Number} the greatest seatID decoded
+ */
+function findMySeatId(boardingPassList) {
+  let seatIds = new Array();
+  boardingPassList.forEach((boardingPass) => {
+    const rowSequence = boardingPass.substring(0, 7);
+    const colSequence = boardingPass.substring(7);
+    let rowMin = 0;
+    let rowMax = 127;
+    let colMin = 0;
+    let colMax = 7;
+    for (let i = 0; i < rowSequence.length; i++) {
+      if (/^[fF]$/.test(rowSequence[i])) {
+        rowMax = (rowMin + rowMax) / 2;
+      } else if (/^[bB]$/.test(rowSequence[i])) {
+        rowMin = (rowMin + rowMax) / 2;
+      }
+    }
+    const seatRow = Math.floor(rowMax);
+    for (let i = 0; i < colSequence.length; i++) {
+      if (/^[lL]$/.test(colSequence[i])) {
+        colMax = (colMin + colMax) / 2;
+      } else if (/^[rR]$/.test(colSequence[i])) {
+        colMin = (colMin + colMax) / 2;
+      }
+    }
+    const seatColumn = Math.floor(colMax);
+    seatIds.push(parseInt(seatRow * 8 + seatColumn));
+  });
+  seatIds = seatIds.sort((a, b) => a - b);
+  let mySeat;
+  for (let i = 1; i < seatIds.length - 1; i++) {
+    if (seatIds[i] + 1 !== seatIds[i + 1]) mySeat = seatIds[i] + 1;
+  }
+  return mySeat;
+}
+
+console.log("Puzzle 1 - greatest seat id: ", getHighestId(input));
+console.log("Puzzle 2 - my seat id: ", findMySeatId(input));
