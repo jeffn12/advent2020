@@ -1053,4 +1053,26 @@ function findWeakness(preambleLength = 5, inputList = sampleInput) {
   return false;
 }
 
+/**
+ * Puzzle 2 - Exploit the weakness.  With the target identified, the exploit will be the sum of the least and greatest numbers in the list of consecutive entries that sum to the weakness.
+ *
+ * @param {Number} preambleLength length of the preamble to check - defaults to 5
+ * @param {[Number]} inputList list of the input numbers - defaults to sampleInput
+ */
+function exploitWeakness(preambleLength = 5, inputList = sampleInput) {
+  const target = findWeakness(preambleLength, inputList);
+  for (let i = 0; i < inputList.length; i++) {
+    let checkList = [inputList[i]];
+    for (let j = i + 1; j < inputList.length; j++) {
+      checkList.push(inputList[j]);
+      const sumOfCheckListValues = checkList.reduce((acc, val) => acc + val);
+      if (sumOfCheckListValues === target) {
+        return Math.min(...checkList) + Math.max(...checkList);
+      }
+    }
+  }
+  return false;
+}
+
 console.log("Puzzle 1 - the weak data entry is:", findWeakness(25, input));
+console.log("Puzzle 2 - the exploit is:", exploitWeakness(25, input));
