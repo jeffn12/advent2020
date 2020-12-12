@@ -105,19 +105,21 @@ function getDifferenceDistribution(inputList) {
     currentJoltage: 0,
     differenceCounts: { 1: 0, 2: 0, 3: 0 },
   };
-  let { currentJoltage, differenceCounts } = joltageBreakdown;
   for (let i in inputList) {
-    if (inputList[i] - currentJoltage > 3) return false;
-    differenceCounts[inputList[i] - currentJoltage] += 1;
-    currentJoltage = inputList[i];
+    if (inputList[i] - joltageBreakdown.currentJoltage > 3) return false;
+    joltageBreakdown.differenceCounts[
+      inputList[i] - joltageBreakdown.currentJoltage
+    ] += 1;
+    joltageBreakdown.currentJoltage = inputList[i];
   }
-  differenceCounts[3] += 1; // make the final jump to device adapter level
-  currentJoltage += 3;
-  joltageBreakdown.joltageProduct = differenceCounts[1] * differenceCounts[3];
+  joltageBreakdown.differenceCounts[3] += 1;
+  joltageBreakdown.currentJoltage += 3;
+  joltageBreakdown.joltageProduct =
+    joltageBreakdown.differenceCounts[1] * joltageBreakdown.differenceCounts[3];
   return joltageBreakdown;
 }
 
 console.log(
   'Puzzle 1 - product of joltage chain distributions:',
-  getDifferenceDistribution(input).joltageProduct
+  getDifferenceDistribution(input)
 );
